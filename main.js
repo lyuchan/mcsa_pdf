@@ -27,7 +27,7 @@ async function addWatermark(inputFile, outputFile) {
         let xr = getRandomArbitrary(xrmin, xrmax)
         let yr = getRandomArbitrary(yrmin, yrmax)
         let dg = getRandomArbitrary(dgmin, dgmax)
-        watermarkImage = watermarkImages[getRandomArbitrary(1, watermarkImages.length - 1)]
+        watermarkImage = watermarkImages[getRandomArbitrary(0, watermarkImages.length - 1)]
         const watermarkDim = watermarkImage.scale(1);
         page.drawImage(watermarkImage, {
             x: xr,
@@ -47,7 +47,7 @@ async function addWatermark(inputFile, outputFile) {
     for (let i = 2; i < pages.length; i += 2) {
         const page = pages[i];
         const page1 = pages[i - 1];
-        watermarkImage = watermarkImages[getRandomArbitrary(1, watermarkImages.length - 1)]
+        watermarkImage = watermarkImages[getRandomArbitrary(0, watermarkImages.length - 1)]
         const watermarkDim = watermarkImage.scale(1);
         let xr = getRandomArbitrary(xrmin, xrmax)
         let yr = getRandomArbitrary(yrmin, yrmax)
@@ -74,7 +74,15 @@ function getRandomArbitrary(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-
+if (!fs.existsSync('./output')) {
+    fs.mkdirSync('./output');
+}
+if (!fs.existsSync('./pdf_in')) {
+    fs.mkdirSync('./pdf_in');
+}
+if (!fs.existsSync('./png_in')) {
+    fs.mkdirSync('./png_in');
+}
 fs.readdir('./pdf_in', (err, files) => {
     if (err) {
         throw err;
