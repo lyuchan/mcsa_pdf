@@ -1,10 +1,17 @@
 const fs = require('fs');
+const path = require('path');
 const { PDFDocument, rgb, degrees } = require('pdf-lib');
-async function addWatermark(inputFile, watermarkFile, outputFile) {
+async function addWatermark(inputFile, outputFile) {
     const existingPdfBytes = fs.readFileSync(inputFile);
-    const watermarkImageBytes = fs.readFileSync(watermarkFile);
+    //const watermarkImageBytes = fs.readFileSync(watermarkFile);
+    const watermarkFiles = fs.readdirSync('./png_in').map(file => path.join('./png_in', file));
+    const watermarkImageBytes = watermarkFiles.map(file => fs.readFileSync(file));
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
-    const watermarkImage = await pdfDoc.embedPng(watermarkImageBytes);
+    let watermarkImages = []
+    for (let i = 0; i < watermarkImageBytes.length; i++) {
+        watermarkImages.push(await pdfDoc.embedPng(watermarkImageBytes[i]));
+    }
+    let watermarkImage = watermarkImages[getRandomArbitrary(0, watermarkImages.length - 1)]
     const pages = pdfDoc.getPages();
     const pngsize = 6//越大越小
     const xrmax = -40;
@@ -16,10 +23,12 @@ async function addWatermark(inputFile, watermarkFile, outputFile) {
     for (let i = 1; i < pages.length; i += 2) {
         const page = pages[i];
         const page1 = pages[i - 1];
-        const watermarkDim = watermarkImage.scale(1);
+
         let xr = getRandomArbitrary(xrmin, xrmax)
         let yr = getRandomArbitrary(yrmin, yrmax)
         let dg = getRandomArbitrary(dgmin, dgmax)
+        watermarkImage = watermarkImages[getRandomArbitrary(1, watermarkImages.length - 1)]
+        const watermarkDim = watermarkImage.scale(1);
         page.drawImage(watermarkImage, {
             x: xr,
             y: yr,
@@ -38,6 +47,7 @@ async function addWatermark(inputFile, watermarkFile, outputFile) {
     for (let i = 2; i < pages.length; i += 2) {
         const page = pages[i];
         const page1 = pages[i - 1];
+        watermarkImage = watermarkImages[getRandomArbitrary(1, watermarkImages.length - 1)]
         const watermarkDim = watermarkImage.scale(1);
         let xr = getRandomArbitrary(xrmin, xrmax)
         let yr = getRandomArbitrary(yrmin, yrmax)
@@ -60,7 +70,16 @@ async function addWatermark(inputFile, watermarkFile, outputFile) {
     const pdfBytes = await pdfDoc.save();
     fs.writeFileSync(outputFile, pdfBytes);
 }
-addWatermark('Meow.pdf', 'test.png', './output/output.pdf');
 function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+
+fs.readdir('./pdf_in', (err, files) => {
+    if (err) {
+        throw err;
+    }
+    files.forEach(file => {
+        addWatermark(`./pdf_in/${file}`, `./output/${file}`);
+    });
+});
