@@ -1,0 +1,22 @@
+{
+  "name": "mcsa_pdf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lyuchan/mcsa_pdf.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lyuchan/mcsa_pdf/issues"
+  },
+  "homepage": "https://github.com/lyuchan/mcsa_pdf#readme",
+  "dependencies": {
+    "pdf-lib": "^1.17.1"
+  }
+}
